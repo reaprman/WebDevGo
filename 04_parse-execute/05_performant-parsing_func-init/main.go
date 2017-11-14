@@ -6,13 +6,14 @@ import (
 	"text/template"
 )
 
-func main() {
-	tpl, err := template.ParseGlob("templates/*.gohtml")
-	if err != nil {
-		log.Fatalln(err)
-	}
+var tpl *template.Template
 
-	err = tpl.Execute(os.Stdout, nil)
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
+}
+
+func main() {
+	err := tpl.Execute(os.Stdout, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -22,12 +23,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	err = tpl.ExecuteTemplate(os.Stdout, "one.gohtml", nil)
+	err = tpl.ExecuteTemplate(os.Stdout, "two.gohtml", nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	err = tpl.ExecuteTemplate(os.Stdout, "two.gohtml", nil)
+	err = tpl.ExecuteTemplate(os.Stdout, "one.gohtml", nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -35,14 +36,13 @@ func main() {
 
 /*
 Run Result:
-
 ******
 ONE
 ************
 VESPA
 ************
-ONE
-************
 TWO
+************
+ONE
 ******
 */
