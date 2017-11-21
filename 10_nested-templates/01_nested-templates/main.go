@@ -9,20 +9,11 @@ import (
 var tpl *template.Template
 
 func init() {
-	tpl = template.Must(template.ParseFiles("tpl.gohtml"))
+	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
 }
 
 func main() {
-
-	g1 := struct {
-		Score1 int
-		Score2 int
-	}{
-		7,
-		9,
-	}
-
-	err := tpl.Execute(os.Stdout, g1)
+	err := tpl.ExecuteTemplate(os.Stdout, "index.gohtml", 42)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -34,19 +25,13 @@ Run Result:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Predefined Global Functions<title>
+    <title>Hello World!</title>
 </head>
 <body>
-
-
-
-    SCORE 1 < SCORE 2
-
-
-
-
-
-    LAST ONE: SCORE < 10
+<h1>The meaning of life: 42</h1>
+<p>
+Here is my polar bear template
+</p>
 </body>
 </html>
 */
