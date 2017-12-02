@@ -32,8 +32,9 @@ func handle(conn net.Conn) {
 	defer conn.Close()
 
 	// we never get here
-	//we have an open stream connection
-	// howw does the above reader know when its done
+	// we have an open stream connection
+	// how does the above reader know when its done
+	fmt.Println("We Got Here")
 }
 
 /*
