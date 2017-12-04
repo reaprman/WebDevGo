@@ -40,9 +40,11 @@ func request(conn net.Conn) {
 	for scanner.Scan() {
 		ln := scanner.Text()
 		fmt.Println(ln)
-		if i == 1 {
-			m := strings.Fields(ln)[1]
-			fmt.Println("***URL", m)
+		if i == 0 {
+			m := strings.Fields(ln)[0]
+			u := strings.Fields(ln)[1]
+			fmt.Println("***METHOD", m)
+			fmt.Println("***URI", u)
 		}
 		if ln == "" {
 			// header is done, break from for loop
@@ -60,3 +62,29 @@ func respond(conn net.Conn) {
 	fmt.Fprint(conn, "Content-Type: text/html\r\n")
 	fmt.Fprint(conn, body)
 }
+
+/*
+Run Result:
+
+GET / HTTP/1.1
+Host: localhost:8080
+***URL localhost:8080
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36
+Upgrade-Insecure-Requests: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*`/*;q=0.8
+DNT: 1
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9
+
+GET /favicon.ico HTTP/1.1
+Host: localhost:8080
+***URL localhost:8080
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36
+Accept: image/webp,image/apng,image/*,*`/*;q=0.8
+DNT: 1
+Referer: http://localhost:8080/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9
+*/
