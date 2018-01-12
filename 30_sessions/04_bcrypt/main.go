@@ -5,18 +5,19 @@ import (
 	"net/http"
 
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type user struct {
 	UserName string
-	Password string
+	Password []byte
 	First    string
 	Last     string
 }
 
 var tpl *template.Template
-var dbSessions = map[string]string{} // session ID, user ID
-var dbUsers = map[string]user{}      // user Id, user
+var dbSessions = map[string]string{}
+var dbUsers = make(map[string]user)
 
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
@@ -36,6 +37,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 }
 
 func bar(w http.ResponseWriter, req *http.Request) {
+
 	u := getUser(w, req)
 	if !alreadyLoggedIn(req) {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
@@ -50,6 +52,7 @@ func signup(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	var u user
 	// process form submission
 	if req.Method == http.MethodPost {
 
@@ -58,7 +61,7 @@ func signup(w http.ResponseWriter, req *http.Request) {
 		f := req.FormValue("firstname")
 		l := req.FormValue("lastname")
 
-		// username taken?
+		// check if user already exists
 		if _, ok := dbUsers[un]; ok {
 			http.Error(w, "Username already taken", http.StatusForbidden)
 			return
@@ -73,19 +76,20 @@ func signup(w http.ResponseWriter, req *http.Request) {
 		http.SetCookie(w, c)
 		dbSessions[c.Value] = un
 
-		// store user in dbUsers
-		u := user{un, p, f, l}
+		// encrypt password
+		bs, err := bcrypt.GenerateFromPassword([]byte(p), bcrypt.MinCost)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		//store user in dbUsers
+		u := user{un, bs, f, l}
 		dbUsers[un] = u
 
 		// redirect
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
-
-	tpl.ExecuteTemplate(w, "signup.gohtml", nil)
+	tpl.ExecuteTemplate(w, "signup.gohtml", u)
 }
-
-/*
-Run Result:
-
-*/
