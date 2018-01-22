@@ -29,6 +29,8 @@ func gen() <-chan int {
 }
 
 /*
+Program never exits and keeps running due to leaked goroutine
+
 Run Result:
 0
 1
